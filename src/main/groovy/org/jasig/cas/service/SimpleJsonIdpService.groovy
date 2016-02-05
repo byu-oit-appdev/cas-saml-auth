@@ -64,8 +64,8 @@ class SimpleJsonIdpService implements IdpService {
         def samlCredential = springSecuritySamlCredentials.samlCredential
         def idp = getIdpByEntityId(samlCredential.remoteEntityID)
         def idAttribute = idp.principalAttribute ?: "principal"
-        return (samlCredential.getAttribute(idAttribute) ?: samlCredential.attributes.find {
+        return (idAttribute.equals("NameID")?samlCredential.getNameID().getValue().trim():(samlCredential.getAttribute(idAttribute) ?: samlCredential.attributes.find {
             it.friendlyName == idAttribute
-        })?.DOM?.textContent.trim()
+        })?.DOM?.textContent.trim())
     }
 }

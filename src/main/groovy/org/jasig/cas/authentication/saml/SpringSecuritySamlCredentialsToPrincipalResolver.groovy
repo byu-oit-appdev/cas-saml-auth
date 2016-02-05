@@ -14,25 +14,31 @@ import org.springframework.beans.factory.annotation.Autowired
  * @author Dmitriy Kopylenko
  * @author Unicon, inc.
  */
-class SpringSecuritySamlCredentialsToPrincipalResolver implements CredentialsToPrincipalResolver {
+class SpringSecuritySamlCredentialsToPrincipalResolver extends
+        AbstractPersonDirectoryCredentialsToPrincipalResolver {
     @Autowired
     IdpService idpService
 
-    @Override
-    Principal resolvePrincipal(Credentials credentials) {
-        def p = idpService.extractPrincipalId(credentials)
-        if (!p) {
-            return null
-        }
-
-        def attributes = ((SpringSecuritySamlCredentials)credentials).samlCredential.attributes.collectEntries {
-            [(it.friendlyName ?: it.name): (it.attributeValues.size() == 1? it.attributeValues.get(0).DOM?.textContent.trim() : it.attributeValues.collect {it.DOM?.textContent.trim()})]
-        }
-        return new SimplePrincipal(p, attributes)
-    }
+//    @Override
+//    Principal resolvePrincipal(Credentials credentials) {
+//        def p = idpService.extractPrincipalId(credentials)
+//        if (!p) {
+//            return null
+//        }
+//
+//        def attributes = ((SpringSecuritySamlCredentials)credentials).samlCredential.attributes.collectEntries {
+//            [(it.friendlyName ?: it.name): (it.attributeValues.size() == 1? it.attributeValues.get(0).DOM?.textContent.trim() : it.attributeValues.collect {it.DOM?.textContent.trim()})]
+//        }
+//        return new SimplePrincipal(p, attributes)
+//    }
 
     @Override
     boolean supports(Credentials credentials) {
         return credentials == null ? false : SpringSecuritySamlCredentials.isAssignableFrom(credentials.class)
+    }
+
+    @Override
+    String extractPrincipalId(Credentials credentials){
+        return idpService.extractPrincipalId(credentials)
     }
 }
