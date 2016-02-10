@@ -26,7 +26,7 @@ class SamlCredentialAdaptingAction {
 
     static final String CREDENTIALS_KEY = "samlCredentials"
 
-    public void wrapSamlCredentialAndPlaceInFlowScope(RequestContext context) {
+    public void wrapSamlCredentialAndPlaceInFlowScope(RequestContext context, String whoFrom) {
         final def sessionMap = context.externalContext.sessionMap
         try {
             if (sessionMap.contains(SPRING_SECURITY_LAST_EXCEPTION_KEY)) {
@@ -35,7 +35,7 @@ class SamlCredentialAdaptingAction {
             final def sc = sessionMap.get(SPRING_SECURITY_CONTEXT_KEY) as SecurityContext
             context.flowScope.put(
                     CREDENTIALS_KEY,
-                    new SpringSecuritySamlCredentials(sc.authentication.credentials as SAMLCredential)
+                    new SpringSecuritySamlCredentials(sc.authentication.credentials as SAMLCredential, whoFrom)
             )
         }
         finally {

@@ -14,9 +14,11 @@ import org.springframework.security.saml.SAMLCredential
 @EqualsAndHashCode
 class SpringSecuritySamlCredentials implements Credentials {
     final SAMLCredential samlCredential
+    String whoFrom
 
-    SpringSecuritySamlCredentials(SAMLCredential samlCredential) {
+    SpringSecuritySamlCredentials(SAMLCredential samlCredential, String whoFrom) {
         this.samlCredential = samlCredential
+        this.whoFrom = whoFrom
     }
 
     /*

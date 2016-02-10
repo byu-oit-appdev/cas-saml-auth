@@ -6,7 +6,14 @@ import org.jasig.cas.authentication.principal.CredentialsToPrincipalResolver
 import org.jasig.cas.authentication.principal.Principal
 import org.jasig.cas.authentication.principal.SimplePrincipal
 import org.jasig.cas.service.IdpService
+import org.jasig.services.persondir.IPersonAttributeDao
+import org.jasig.services.persondir.IPersonAttributes
+import org.jasig.services.persondir.support.StubPersonAttributeDao
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+
+import javax.validation.constraints.NotNull
 
 /**
  * {@link org.jasig.cas.authentication.principal.CredentialsToPrincipalResolver} for {@link SpringSecuritySamlCredentials}
@@ -14,8 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired
  * @author Dmitriy Kopylenko
  * @author Unicon, inc.
  */
-class SpringSecuritySamlCredentialsToPrincipalResolver extends
-        AbstractPersonDirectoryCredentialsToPrincipalResolver {
+class SpringSecuritySamlCredentialsToPrincipalResolver implements CredentialsToPrincipalResolver {
     @Autowired
     IdpService idpService
 
@@ -32,13 +38,78 @@ class SpringSecuritySamlCredentialsToPrincipalResolver extends
 //        return new SimplePrincipal(p, attributes)
 //    }
 
+
+    /** Log instance. */
+    protected final Logger log = LoggerFactory.getLogger(this.getClass());
+
+    private boolean returnNullIfNoAttributes = false;
+
+    /** Repository of principal attributes to be retrieved */
+    @NotNull
+    private IPersonAttributeDao attributeRepository = new StubPersonAttributeDao(new HashMap<String, List<Object>>());
+
     @Override
-    boolean supports(Credentials credentials) {
-        return credentials == null ? false : SpringSecuritySamlCredentials.isAssignableFrom(credentials.class)
+    public Principal resolvePrincipal(Credentials credentials) {
+        if (log.isDebugEnabled()) {
+            log.debug("Attempting to resolve a principal...");
+        }
+
+        final String principalId2 = idpService.extractPrincipalId(credentials);
+
+        if (log.isDebugEnabled()) {
+            log.debug("Received PrimaryPrincipal (NameID and provider) [" + principalId2 + "]");
+        }
+
+        if (principalId2 == null) {
+            return null;
+        }
+
+        final IPersonAttributes personAttributes = this.attributeRepository.getPerson(principalId2);
+
+        final String principalId = (String) personAttributes.getAttributeValue("netId");
+
+        if (log.isDebugEnabled()) {
+            log.debug("Creating SimplePrincipal for [" + principalId + "]");
+        }
+
+        final Map<String, List<Object>> attributes;
+
+        if (personAttributes == null) {
+            attributes = null;
+        } else {
+            attributes = personAttributes.getAttributes();
+        }
+
+        if (attributes == null & !this.returnNullIfNoAttributes) {
+            return new SimplePrincipal(principalId);
+        }
+
+        if (attributes == null) {
+            return null;
+        }
+
+        final Map<String, Object> convertedAttributes = new HashMap<String, Object>();
+
+        for (final Map.Entry<String, List<Object>> entry : attributes.entrySet()) {
+            final String key = entry.getKey();
+            final Object value = entry.getValue().size() == 1 ? entry.getValue().get(0) : entry.getValue();
+            convertedAttributes.put(key, value);
+        }
+        return new SimplePrincipal(principalId, convertedAttributes);
+    }
+
+    public final void setAttributeRepository(final IPersonAttributeDao attributeRepository) {
+        this.attributeRepository = attributeRepository;
+    }
+
+    public void setReturnNullIfNoAttributes(final boolean returnNullIfNoAttributes) {
+        this.returnNullIfNoAttributes = returnNullIfNoAttributes;
     }
 
     @Override
-    String extractPrincipalId(Credentials credentials){
-        return idpService.extractPrincipalId(credentials)
+    boolean supports(Credentials credentials) {
+        return credentials == null ? false : SpringSecuritySamlCredentials.isAssignableFrom(credentials.class);
     }
+
+
 }
