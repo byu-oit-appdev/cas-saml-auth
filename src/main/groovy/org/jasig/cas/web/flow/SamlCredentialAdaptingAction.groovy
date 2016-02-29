@@ -24,7 +24,7 @@ class SamlCredentialAdaptingAction {
     private static final String SPRING_SECURITY_CONTEXT_KEY = "SPRING_SECURITY_CONTEXT"
     private static final String SPRING_SECURITY_LAST_EXCEPTION_KEY = "SPRING_SECURITY_LAST_EXCEPTION"
 
-    static final String CREDENTIALS_KEY = "samlCredentials"
+    static final String CREDENTIALS_KEY = "credentials"
 
     public void wrapSamlCredentialAndPlaceInFlowScope(RequestContext context, String whoFrom) {
         final def sessionMap = context.externalContext.sessionMap

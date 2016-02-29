@@ -64,7 +64,7 @@ class SamlWebFlowConfigurer {
         }
 
         new SubflowState(flow, "samlSubflow", new SubflowExpression(new LiteralExpression("saml"), flowDefinitionRegistry)).with {
-            ['warn', 'generateLoginTicket', 'sendTicketGrantingTicket'].each {
+            ['warn', 'sendTicketGrantingTicket', 'generateLoginTicket', 'casAccountDisabledView', 'casMustChangePassView', 'casAccountLockedView', 'casBadHoursView', 'casBadWorkstationView', 'casExpiredPassView'].each {
                 transitionSet.add(new Transition(new DefaultTransitionCriteria(new LiteralExpression(it)), new DefaultTargetStateResolver(it)))
             }
         }
