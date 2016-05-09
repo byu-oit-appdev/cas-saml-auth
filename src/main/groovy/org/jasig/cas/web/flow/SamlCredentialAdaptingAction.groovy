@@ -33,10 +33,13 @@ class SamlCredentialAdaptingAction {
                 throw new ExternalSamlAuthenticationException(sessionMap.get(SPRING_SECURITY_LAST_EXCEPTION_KEY) as Throwable)
             }
             final def sc = sessionMap.get(SPRING_SECURITY_CONTEXT_KEY) as SecurityContext
+            final def samlCredential = sc.authentication.credentials as SAMLCredential
             context.flowScope.put(
                     CREDENTIALS_KEY,
-                    new SpringSecuritySamlCredentials(sc.authentication.credentials as SAMLCredential, whoFrom)
+                    new SpringSecuritySamlCredentials(samlCredential, whoFrom)
             )
+
+            context.flowScope.put("credentialName", samlCredential.getNameID().getValue().trim())
         }
         finally {
             sessionMap.remove(SPRING_SECURITY_CONTEXT_KEY)

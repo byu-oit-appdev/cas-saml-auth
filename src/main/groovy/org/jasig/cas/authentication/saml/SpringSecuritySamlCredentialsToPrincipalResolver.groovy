@@ -25,19 +25,6 @@ class SpringSecuritySamlCredentialsToPrincipalResolver implements CredentialsToP
     @Autowired
     IdpService idpService
 
-//    @Override
-//    Principal resolvePrincipal(Credentials credentials) {
-//        def p = idpService.extractPrincipalId(credentials)
-//        if (!p) {
-//            return null
-//        }
-//
-//        def attributes = ((SpringSecuritySamlCredentials)credentials).samlCredential.attributes.collectEntries {
-//            [(it.friendlyName ?: it.name): (it.attributeValues.size() == 1? it.attributeValues.get(0).DOM?.textContent.trim() : it.attributeValues.collect {it.DOM?.textContent.trim()})]
-//        }
-//        return new SimplePrincipal(p, attributes)
-//    }
-
 
     /** Log instance. */
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -60,11 +47,12 @@ class SpringSecuritySamlCredentialsToPrincipalResolver implements CredentialsToP
             log.debug("Received PrimaryPrincipal (NameID and provider) [" + principalId2 + "]");
         }
 
-        if (principalId2 == null) {
+        final IPersonAttributes personAttributes = this.attributeRepository.getPerson(principalId2);
+
+        if(personAttributes == null){
+//            Return null and error to the need to associate account page
             return null;
         }
-
-        final IPersonAttributes personAttributes = this.attributeRepository.getPerson(principalId2);
 
         final String principalId = (String) personAttributes.getAttributeValue("netId");
 
