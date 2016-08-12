@@ -1,6 +1,5 @@
 package org.jasig.cas.authentication.saml
 
-import org.jasig.cas.authentication.principal.AbstractPersonDirectoryCredentialsToPrincipalResolver
 import org.jasig.cas.authentication.principal.Credentials
 import org.jasig.cas.authentication.principal.CredentialsToPrincipalResolver
 import org.jasig.cas.authentication.principal.Principal
