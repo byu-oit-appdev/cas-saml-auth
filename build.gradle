@@ -44,6 +44,7 @@ dependencies {
 
     provided "org.jasig.cas:cas-server-core:${project."cas.version"}"
     provided "javax.servlet:servlet-api:2.5"
+    provided "org.json:json:20160212"
 
     testCompile "org.spockframework:spock-core:${project."spock.version"}"
 
