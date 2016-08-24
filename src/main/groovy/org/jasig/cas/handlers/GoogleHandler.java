@@ -4,49 +4,44 @@ package org.jasig.cas.handlers;
  * Created by swlyons on 7/29/2016.
  */
 
-import org.jasig.cas.credentials.FacebookCredentials;
+import org.jasig.cas.credentials.GoogleCredentials;
 import org.jasig.cas.authentication.handler.AuthenticationException;
 import org.jasig.cas.authentication.handler.NamedAuthenticationHandler;
 import org.jasig.cas.authentication.principal.Credentials;
 import org.json.JSONObject;
+
 import javax.validation.constraints.NotNull;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
 import org.springframework.beans.factory.InitializingBean;
 
-public class FacebookHandler implements NamedAuthenticationHandler, InitializingBean {
+public class GoogleHandler implements NamedAuthenticationHandler, InitializingBean {
 
 
     @NotNull
-    private String facebookApiId;
+    private String googleApiId;
 
-    @NotNull
-    private String facebookApiSecret;
-
-    public void setFacebookApiId(String facebookApiId) {
-        this.facebookApiId = facebookApiId;
-    }
-
-    public void setFacebookApiSecret(String facebookApiSecret) {
-        this.facebookApiSecret = facebookApiSecret;
+    public void setGoogleApiId(String googleApiId) {
+        this.googleApiId = googleApiId;
     }
 
     @Override
     public String getName() {
-        return "FacebookHandler";
+        return "GoogleHandler";
     }
 
     @Override
     public boolean authenticate(Credentials credentials) throws AuthenticationException {
-        FacebookCredentials facebookCredentials = (FacebookCredentials) credentials;
-        String userAccessToken = facebookCredentials.getAccessToken();
-        String userID = facebookCredentials.getUserID();
+        GoogleCredentials googleCredentials = (GoogleCredentials) credentials;
+        String userAccessToken = googleCredentials.getAccessToken();
+        String userID = googleCredentials.getUserID();
         HttpURLConnection connection = null;
         try {
-            URL url = new URL("https://graph.facebook.com/debug_token?input_token=" + userAccessToken + "&access_token=" + facebookApiId + "|" + facebookApiSecret);
+            URL url = new URL("https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=" + userAccessToken);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setUseCaches(false);
@@ -69,11 +64,11 @@ public class FacebookHandler implements NamedAuthenticationHandler, Initializing
                 connection.disconnect();
             }
 
-            JSONObject json = (new JSONObject(response.toString()).getJSONObject("data"));
+            JSONObject json = new JSONObject(response.toString());
 
-            if (json.getBoolean("is_valid") && json.getString("app_id").equals(facebookApiId) && json.getString("user_id").equals(userID)) {
+            if ((json.getString("iss").equals("accounts.google.com")||json.getString("iss").equals("https://accounts.google.com"))&&0<json.getInt("exp")&&json.getString("aud").equals(googleApiId)&&json.getString("sub").equals(userID)) {
                 return true;
-            }else {
+            } else {
                 return false;
             }
         } catch (Exception e) {
@@ -86,7 +81,7 @@ public class FacebookHandler implements NamedAuthenticationHandler, Initializing
 
     @Override
     public boolean supports(Credentials credentials) {
-        return credentials == null ? false : (credentials instanceof FacebookCredentials);
+        return credentials == null ? false : (credentials instanceof GoogleCredentials);
     }
 
     @Override
