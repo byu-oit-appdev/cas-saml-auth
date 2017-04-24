@@ -38,7 +38,45 @@ class SamlCredentialAdaptingAction {
                     new SpringSecuritySamlCredentials(samlCredential, whoFrom)
             )
 
-            context.flowScope.put("credentialName", samlCredential.getNameID().getValue().trim())
+//            context.flowScope.put("credentialName", samlCredential.getNameID().getValue().trim())
+
+//            context.flowScope.put("credentialName", samlCredential.getNameID().getValue().trim())
+//            context.flowScope.put("credentialName2", samlCredential.getNameID().getValue().trim())
+            context.flowScope.put("credentialName", samlCredential.getAttributeAsString("ldsAccountID"))
+            context.flowScope.put("credentialName2", samlCredential.getAttributeAsString("ldsAccountID"))
+            context.flowScope.put("ldsCMISID", samlCredential.getAttributeAsString("ldsCMISID"))
+//            context.flowScope.put("preferredName", samlCredential.getAttributeAsString("preferredName"))
+//            context.flowScope.put("ldsEmailAddress", samlCredential.getAttributeAsString("ldsEmailAddress"))
+            context.flowScope.put("genericEmail", samlCredential.getAttributeAsString("ldsEmailAddress"))
+//            context.flowScope.put("givenName", samlCredential.getAttributeAsString("givenName"))
+            context.flowScope.put("userName", samlCredential.getAttributeAsString("cn")) //username?
+            context.flowScope.put("userName2", samlCredential.getAttributeAsString("cn")) //username?
+            context.flowScope.put("genericName", samlCredential.getAttributeAsString("cn")) //username?
+//            context.flowScope.put("sn", samlCredential.getAttributeAsString("sn"))
+
+
+        }
+        finally {
+            sessionMap.remove(SPRING_SECURITY_CONTEXT_KEY)
+            sessionMap.remove(SPRING_SECURITY_LAST_EXCEPTION_KEY)
+        }
+    }
+
+    public void wrapSamlCredentialAndPlaceInFlowScope2(RequestContext context, String whoFrom) {
+        final def sessionMap = context.externalContext.sessionMap
+        try {
+            if (sessionMap.contains(SPRING_SECURITY_LAST_EXCEPTION_KEY)) {
+                throw new ExternalSamlAuthenticationException(sessionMap.get(SPRING_SECURITY_LAST_EXCEPTION_KEY) as Throwable)
+            }
+            final def sc = sessionMap.get(SPRING_SECURITY_CONTEXT_KEY) as SecurityContext
+            final def samlCredential = sc.authentication.credentials as SAMLCredential
+            context.flowScope.put(
+                    CREDENTIALS_KEY,
+                    new SpringSecuritySamlCredentials(samlCredential, whoFrom)
+            )
+
+            context.flowScope.put("credentialName", samlCredential.getAttributeAsString("ldsAccountID"))
+            context.flowScope.put("userName", samlCredential.getAttributeAsString("cn")) //username?
         }
         finally {
             sessionMap.remove(SPRING_SECURITY_CONTEXT_KEY)
@@ -46,3 +84,4 @@ class SamlCredentialAdaptingAction {
         }
     }
 }
+
