@@ -13,8 +13,8 @@ ddd:
   ubiquitous_language_url: 
   context_map_url: 
 links:
-  system_documentation_url: https://github.com/byu-oit-appdev/cas-saml-auth
-  source_repo_url: https://github.com/byu-oit-appdev/cas-saml-auth
+  system_documentation_url: https://github.com/byu-oit/cas-saml-auth
+  source_repo_url: https://github.com/byu-oit/cas-saml-auth
   swagger_urls:
 microservice: False
 technologies_used:
@@ -47,5 +47,5 @@ tags:
   env: prd
   app: cas-saml-auth
   team: gro:AD-Identity and Access Management
-federation_json_url: https://raw.githubusercontent.com/byu-oit-appdev/cas-saml-auth/master/.repo-meta.yml
+federation_json_url: https://raw.githubusercontent.com/byu-oit/cas-saml-auth/master/.repo-meta.yml
 
