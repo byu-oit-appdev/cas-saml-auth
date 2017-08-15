@@ -38,7 +38,7 @@ class LoginFlowResumingController {
          */
 
         response.setContentType("text/html; charset=UTF-8");
-        
+
         def builder = new MarkupBuilder(response.writer)
         builder.html {
             body(onLoad: "document.forms[0].submit();") {
