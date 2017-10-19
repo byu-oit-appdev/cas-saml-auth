@@ -48,30 +48,21 @@ class SamlCredentialAdaptingAction {
                 context.flowScope.put("credentialName2", samlCredential.getAttributeAsString("ldsAccountID"))
                 context.flowScope.put("ldsCMISID", samlCredential.getAttributeAsString("ldsCMISID"))
                 //            context.flowScope.put("preferredName", samlCredential.getAttributeAsString("preferredName"))
-                //            context.flowScope.put("ldsEmailAddress", samlCredential.getAttributeAsString("ldsEmailAddress"))
                 context.flowScope.put("genericEmail", samlCredential.getAttributeAsString("ldsEmailAddress"))
                 //            context.flowScope.put("givenName", samlCredential.getAttributeAsString("givenName"))
                 context.flowScope.put("userName3", samlCredential.getAttributeAsString("cn")) //username?
                 context.flowScope.put("userName2", samlCredential.getAttributeAsString("cn")) //username?
-                context.flowScope.put("genericName", samlCredential.getAttributeAsString("cn")) //username?
+                context.flowScope.put("genericName", samlCredential.getAttributeAsString("givenName")+" "+samlCredential.getAttributeAsString("sn")) //username?
                 //            context.flowScope.put("sn", samlCredential.getAttributeAsString("sn"))
             }
 
-            if(context.flowScope.get("credentialType").equals("BYU_IDAHO_ID")){
+            if(context.flowScope.get("credentialType").equals("BYU_IDAHO_ID")||context.flowScope.get("credentialType").equals("BYU_HAWAII_ID")){
                 context.flowScope.put("credentialName", samlCredential.getAttributeAsString("urn:oid:1.3.6.1.4.1.5923.1.1.1.6"))
                 context.flowScope.put("credentialName2", samlCredential.getAttributeAsString("urn:oid:1.3.6.1.4.1.5923.1.1.1.6"))
                 context.flowScope.put("genericEmail", samlCredential.getAttributeAsString("urn:oid:0.9.2342.19200300.100.1.3"))
-                context.flowScope.put("userName3", samlCredential.getAttributeAsString("urn:oid:2.5.4.42")+" "+samlCredential.getAttributeAsString("urn:oid:2.5.4.4"))
-                context.flowScope.put("userName2", samlCredential.getAttributeAsString("urn:oid:2.5.4.42")+" "+samlCredential.getAttributeAsString("urn:oid:2.5.4.4")) //username?
-                context.flowScope.put("genericName", samlCredential.getAttributeAsString("urn:oid:2.5.4.42")+" "+samlCredential.getAttributeAsString("urn:oid:2.5.4.4")) //username?
-            }
-            if(context.flowScope.get("credentialType").equals("BYU_HAWAII_ID")){
-                context.flowScope.put("credentialName", samlCredential.getAttributeAsString("urn:oid:1.3.6.1.4.1.5923.1.1.1.6"))
-                context.flowScope.put("credentialName2", samlCredential.getAttributeAsString("urn:oid:1.3.6.1.4.1.5923.1.1.1.6"))
-                context.flowScope.put("genericEmail", samlCredential.getAttributeAsString("urn:oid:0.9.2342.19200300.100.1.3"))
-                context.flowScope.put("userName3", samlCredential.getAttributeAsString("urn:oid:2.5.4.42")+" "+samlCredential.getAttributeAsString("urn:oid:2.5.4.4"))
-                context.flowScope.put("userName2", samlCredential.getAttributeAsString("urn:oid:2.5.4.42")+" "+samlCredential.getAttributeAsString("urn:oid:2.5.4.4")) //username?
-                context.flowScope.put("genericName", samlCredential.getAttributeAsString("urn:oid:2.5.4.42")+" "+samlCredential.getAttributeAsString("urn:oid:2.5.4.4")) //username?
+                context.flowScope.put("userName3", (samlCredential.getAttributeAsString("urn:oid:2.5.4.42")+" "+samlCredential.getAttributeAsString("urn:oid:2.5.4.4")))
+                context.flowScope.put("userName2", (samlCredential.getAttributeAsString("urn:oid:2.5.4.42")+" "+samlCredential.getAttributeAsString("urn:oid:2.5.4.4"))) //username?
+                context.flowScope.put("genericName", (samlCredential.getAttributeAsString("urn:oid:2.5.4.42")+" "+samlCredential.getAttributeAsString("urn:oid:2.5.4.4"))) //username?
             }
 
         }
@@ -97,12 +88,12 @@ class SamlCredentialAdaptingAction {
             if(context.flowScope.get("credentialType").equals("LDS_ACCOUNT_ID")) {
                 context.flowScope.put("credentialName", samlCredential.getAttributeAsString("ldsAccountID"))
                 context.flowScope.put("userName3", samlCredential.getAttributeAsString("cn")) //username?
-                if(context.flowScope.get("credentialType").equals("BYU_IDAHO_ID")){
-
-                }
-                if(context.flowScope.get("credentialType").equals("BYU_HAWAII_ID")){}
-
             }
+            if(context.flowScope.get("credentialType").equals("BYU_IDAHO_ID")||context.flowScope.get("credentialType").equals("BYU_HAWAII_ID")){
+                context.flowScope.put("credentialName", samlCredential.getAttributeAsString("eduPersonPrincipalName"))
+                context.flowScope.put("userName3", samlCredential.getAttributeAsString("givenName")+" "+samlCredential.getAttributeAsString("sn")) //username?
+            }
+
         }
         finally {
             sessionMap.remove(SPRING_SECURITY_CONTEXT_KEY)
