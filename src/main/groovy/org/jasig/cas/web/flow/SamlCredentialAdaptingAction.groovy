@@ -60,7 +60,16 @@ class SamlCredentialAdaptingAction {
                 context.flowScope.put("credentialName", samlCredential.getAttributeAsString("urn:oid:1.3.6.1.4.1.5923.1.1.1.6"))
                 context.flowScope.put("credentialName2", samlCredential.getAttributeAsString("urn:oid:1.3.6.1.4.1.5923.1.1.1.6"))
                 context.flowScope.put("genericEmail", samlCredential.getAttributeAsString("urn:oid:0.9.2342.19200300.100.1.3"))
-                context.flowScope.put("eduPersonScopedAffiliation", samlCredential.getAttributeAsStringArray("urn:oid:1.3.6.1.4.1.5923.1.1.1.9"))
+                String[] scopedAffiliations = samlCredential.getAttributeAsStringArray("urn:oid:1.3.6.1.4.1.5923.1.1.1.9")
+                StringBuilder scopedAffiliationsAsString = new StringBuilder()
+                for(int i =0; i < scopedAffiliations.length;i++){
+                    scopedAffiliationsAsString.append(scopedAffiliations[i])
+                    if(i != scopedAffiliations.length-1){
+                        scopedAffiliationsAsString.append(",")
+                    }
+                }
+
+                context.flowScope.put("eduPersonScopedAffiliation", scopedAffiliationsAsString.toString())
                 context.flowScope.put("userName3", (samlCredential.getAttributeAsString("urn:oid:2.5.4.42")+" "+samlCredential.getAttributeAsString("urn:oid:2.5.4.4")))
                 context.flowScope.put("userName2", (samlCredential.getAttributeAsString("urn:oid:2.5.4.42")+" "+samlCredential.getAttributeAsString("urn:oid:2.5.4.4"))) //username?
                 context.flowScope.put("genericName", (samlCredential.getAttributeAsString("urn:oid:2.5.4.42")+" "+samlCredential.getAttributeAsString("urn:oid:2.5.4.4"))) //username?
